@@ -4,15 +4,15 @@ A synchronisation tool for j-Lawyer that syncs cases and its files to local hard
 Python 3.10 required, download from python.org
 
 Installation:
-open terminal
-Linux, Windows: pip install requests
-MacOs: pip3 install requests
+- open terminal
+- Linux, Windows: pip install requests
+- MacOs: pip3 install requests
 
 go to folder where script is located
 
 Start script:
-MacOS: python3 jL_Sync_Files.py
-Linux/Windows: python jL_Sync_Files.py
+- MacOS: python3 jL_Sync_Files.py
+- Linux/Windows: python jL_Sync_Files.py
 
 How to use: 
 - enter Login Data, save Login Data for your convenience
