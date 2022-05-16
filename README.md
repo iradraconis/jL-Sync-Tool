@@ -5,8 +5,8 @@ Python 3.10 required, download from python.org
 
 Installation:
 - open terminal
-- Linux, Windows: pip install requests, python-dateutil
-- MacOs: pip3 install requests, python-dateutil
+- Linux, Windows: pip install requests python-dateutil
+- MacOs: pip3 install requests python-dateutil
 
 go to folder where script is located
 
