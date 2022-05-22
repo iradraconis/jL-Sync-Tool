@@ -5,8 +5,8 @@ Python 3.10 required, download from python.org
 
 Installation:
 - open terminal
-- Linux, Windows: pip install requests python-dateutil
-- MacOs: pip3 install requests python-dateutil
+- Linux, Windows: pip install requests python-dateutil customtkinter
+- MacOs: pip3 install requests python-dateutil customtkinter
 
 go to folder where script is located
 
@@ -29,7 +29,7 @@ needs to be synchronized.
 What the script does:
 - new Folder "Akten" is created
 - Files from case are downloaded to local folder in "Akten"
-- Beteiligte/tags txt file is created
-- Kalender txt is created   
+- Beteiligte/tags.txt file is created
+- Kalender.txt is created   
 - when new files are added to local folder, this file will be uploaded next time, synchronisation starts.
 - certain cases can be activated for synchronization by giving its File-Number
