@@ -14,9 +14,13 @@ from datetime import datetime
 from dateutil import tz
 import re
 
+import customtkinter as ctk
+
+ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
 # TODO: große Dateien über 100 mb führen ggfs. zu Abbruch des Downloads (Fehler ausgeben, oder Problem anders lösen)
-# TODO: Checkbutton ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
-# TODO: Fehler abfangen und ausgeben, wenn kein oder ungültiges AZ angegeben für Sync an/aus
+# TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
 
 # beim Sync zum Server werden dortige Dateien nicht überschrieben.
 # Fehler, wenn Dateien mit demselben Namen auf dem Server vorhanden sind, aber gelöscht wurden und im Papierkorb liegen
@@ -81,10 +85,22 @@ def switch_sync_on(file_number):
     """die gewählte Akte wird synchronsiert"""
 
     gefundene_akte = list(filter(lambda x: x['fileNumber'] == file_number.strip(), cases_loaded))
+
     # gefundene_akte_nach_name = list(filter(lambda x: x['name'] in file_number, cases_loaded))
 
     print(gefundene_akte)
-    case_id = gefundene_akte[0]['id']
+
+    try:
+        case_id = gefundene_akte[0]['id']
+    except UnboundLocalError:
+        status_text.insert(tk.END, f"\nAktenzeichen ungültig\n")
+        status_text.see(tk.END)
+        return
+    except IndexError:
+        status_text.insert(tk.END, f"\nAktenzeichen ungültig\n")
+        status_text.see(tk.END)
+        return
+
     # status_text.insert(tk.END, f"Gefundene Akten {gefundene_akte_nach_az[0]['fileNumber']}")
 
     user = entry_user.get()
@@ -101,10 +117,12 @@ def switch_sync_on(file_number):
     except requests.exceptions.ConnectionError:
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
+        status_text.see(tk.END)
 
-    print(f"Status code: {r.status_code}")
+
+    #print(f"Status code: {r.status_code}")
     status_text.insert(tk.END,
-                       f'\nDie Akte {gefundene_akte[0]["name"]} - {gefundene_akte[0]["fileNumber"]} wird synchronisiert\n')
+                       f'\nDie Akte {gefundene_akte[0]["name"]} - {gefundene_akte[0]["fileNumber"]} wird nun synchronisiert\n')
     status_text.see(tk.END)
 
 
@@ -114,7 +132,17 @@ def switch_sync_off(file_number):
     gefundene_akte = list(filter(lambda x: x['fileNumber'] == file_number.strip(), cases_loaded))
 
     print(gefundene_akte)
-    case_id = gefundene_akte[0]['id']
+
+    try:
+        case_id = gefundene_akte[0]['id']
+    except UnboundLocalError:
+        status_text.insert(tk.END, f"\nAktenzeichen ungültig\n")
+        status_text.see(tk.END)
+        return
+    except IndexError:
+        status_text.insert(tk.END, f"\nAktenzeichen ungültig\n")
+        status_text.see(tk.END)
+        return
 
     user = entry_user.get()
     password = entry_passwort.get()
@@ -131,7 +159,7 @@ def switch_sync_off(file_number):
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
 
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
     status_text.insert(tk.END,
                        f'\nDie Akte {gefundene_akte[0]["name"]} - {gefundene_akte[0]["fileNumber"]} wird nun nicht mehr synchronisiert\n')
     status_text.see(tk.END)
@@ -183,7 +211,7 @@ def contactsList():
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
 
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
 
     # Speichert die Api Antwort in einer Variablen
     contacts = r.json()
@@ -248,7 +276,7 @@ def contactAbrufen(contact_id):
     except requests.exceptions.ConnectionError:
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
 
     # Speichert die Api Antwort in einer Variablen
     response_dict = r.json()
@@ -272,7 +300,7 @@ def beteiligte_abrufen(case_id):
     except requests.exceptions.ConnectionError:
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
 
     # Speichert die Api Antwort in einer Variablen
     response_dict = r.json()
@@ -296,7 +324,7 @@ def etiketten_abrufen(case_id):
     except requests.exceptions.ConnectionError:
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
 
     # Speichert die Api Antwort in einer Variablen
     response_dict = r.json()
@@ -329,7 +357,7 @@ def dateiSenden(datei_local_name, case_id):
         print("Verbindungsfehler")
         status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
 
-    print(f"Status code: {r.status_code}")
+    # print(f"Status code: {r.status_code}")
     status_text.insert(tk.END, f"\n{file_to_upload} auf den Server geladen\n")
     status_text.see(tk.END)
 
@@ -430,6 +458,7 @@ def getSyncedCases(principal_id):
     Erstellt den Unterordner Akten und je Akte einen Ordner mit dem Kurzrubrum als Namen
     """
 
+
     status_text.insert(tk.END, f"\nAkten werden synchronisiert...\n")
     status_text.see(tk.END)
 
@@ -450,10 +479,14 @@ def getSyncedCases(principal_id):
 
     # Speichert die Api Antwort in einer Variablen
     response_dict = r.json()
-    print(f"Status code: {r.status_code}")
+    #print(f"Status code: {r.status_code}")
     print("-----------------------------------")
-    # Verarbeitet die Ergebnisse
+
+    #global zahl_der_akten_to_sync
     zahl_der_akten_to_sync = len(response_dict)
+
+    progress_bar.configure(maximum=zahl_der_akten_to_sync)
+
     print(f"\nFür {principal_id} sind {zahl_der_akten_to_sync} Akten zu synchronisieren: ")
     status_text.insert(tk.END, f"\nFür {user} sind {zahl_der_akten_to_sync} Akten zu synchronisieren: \n")
     status_text.see(tk.END)
@@ -476,7 +509,6 @@ def getSyncedCases(principal_id):
     else:
         os.mkdir("Akten")
         os.chdir("Akten")
-
     # für die Zahl der zu synchr. Akten wird über den Index ein Ordner angelegt, umbenannt und in den Ordner gewechselt
     while index < zahl_der_akten_to_sync:
 
@@ -497,8 +529,10 @@ def getSyncedCases(principal_id):
         # über die Funktion dateiListeEmpfangen werden alle Pdf Dateien zurückgegeben zu der angefragten Akten ID
         print("\nSynchronisiere die Akte: " + response_dict[index]['name'] + " - " + response_dict[index]['fileNumber'])
         status_text.insert(tk.END,
-                           f'\nSynchronisiere die Akte: {response_dict[index]["name"]} - {response_dict[index]["fileNumber"]}\n\n')
+                           f'\nSynchronisiere die Akte: {response_dict[index]["name"]} - {response_dict[index]["fileNumber"]}\n')
         status_text.see(tk.END)
+        progress_var.set(index)
+        window.update()
         # 2 Listen, id und name werden erstellt und mit den Dateien Remote vergleichen
         datei_liste_response = dateiListeEmpfangen(response_dict[index]['id'])
         # print(datei_liste_response)
@@ -521,7 +555,7 @@ def getSyncedCases(principal_id):
         # jede Datei auf dem Server (PDF, html) wird heruntergeladen und der Name in datei_liste_remote aufgenommen
         # damit beim Upload von Dateien ein Vergleich vorgenommen werden kann mit den lokal und remote vorh. Dateien
         for count, value in enumerate(datei_liste_response):
-            print(count, "Dokument-Id: ", value['id'])
+            #print(count, "Dokument-Id: ", value['id'])
             print(count, "Dokumenten-Name: ", value['name'])
 
             datei_liste_remote.append(value['name'])
@@ -590,22 +624,30 @@ def getSyncedCases(principal_id):
 
         etiketten_in_akte = etiketten_abrufen(response_dict[index]['id'])
 
-        with open('_BETEILIGTE.txt', 'w') as file:
-            for count, value in enumerate(reversed(beteiligte_in_akte)):
-                beteiligte_details = contactAbrufen(value['addressId'])
+        try:
+            with open('_BETEILIGTE.txt', 'w') as file:
+                for count, value in enumerate(reversed(beteiligte_in_akte)):
+                    beteiligte_details = contactAbrufen(value['addressId'])
 
-                file.write("\n###################### Beteiligte ######################\n\n")
-                file.write("Name: " + beteiligte_details['firstName'] + " " + beteiligte_details['name']+" "+ beteiligte_details['company'] + f" ({value['involvementType']})")
-                file.write(
-                    "\nAnschrift: " + beteiligte_details['street'] + " " + beteiligte_details['streetNumber'] + ", " +
-                    beteiligte_details['zipCode'] + " " + beteiligte_details['city'])
-                file.write("\nTelefon: " + beteiligte_details['phone'])
-                file.write("\nMobil: " + beteiligte_details['mobile'])
-                file.write("\neMail: " + beteiligte_details['email'])
-                file.write("\nZeichen: " + value['reference'] + "\n")
-            file.write("\n###################### Etiketten ######################\n\n")
-            for count, value in enumerate(etiketten_in_akte):
-                file.write(value['name'] + ", ")
+                    file.write("\n###################### Beteiligte ######################\n\n")
+                    file.write("Name: " + beteiligte_details['firstName'] + " " + beteiligte_details['name']+" "+ beteiligte_details['company'] + f" ({value['involvementType']})")
+                    file.write(
+                        "\nAnschrift: " + beteiligte_details['street'] + " " + beteiligte_details['streetNumber'] + ", " +
+                        beteiligte_details['zipCode'] + " " + beteiligte_details['city'])
+                    file.write("\nTelefon: " + beteiligte_details['phone'])
+                    file.write("\nMobil: " + beteiligte_details['mobile'])
+                    file.write("\neMail: " + beteiligte_details['email'])
+                    file.write("\nZeichen: " + value['reference'] + "\n")
+                file.write("\n###################### Etiketten ######################\n\n")
+                for count, value in enumerate(etiketten_in_akte):
+                    file.write(value['name'] + ", ")
+        except Exception as e:
+            print("Ein Fehler ist aufgetreten beim Schreiben der Datei BETEILIGTE.txt")
+            print(e)
+            status_text.insert(tk.END, f"\nEin Fehler ist aufgetreten beim Schreiben der Datei BETEILIGTE.txt\n")
+        progress_var.set(index+1)
+        window.update()
+
         os.chdir("..")
 
         index += 1
@@ -622,80 +664,93 @@ def main():
 
 
 ############################# GUI ##########################
-window = tk.Tk()
-window.geometry("607x600+550+150")
+window = ctk.CTk()
+window.geometry("650x730+550+150")
 window.title("j-Lawyer-Tools --- jL-Sync-Files")
 window.columnconfigure(0, weight=1)
 window.rowconfigure(99, weight=1)
 
 status = tk.StringVar(window, "Status...")
+progress_var = tk.IntVar(window)
+
+
 
 # label frame SETTINGS und LOGIN laden und speichern Buttons
-lf = ttk.LabelFrame(window, text='Login - Daten')
-lf.grid(column=0, row=0, padx=20, pady=5)
+lf = ctk.CTkFrame(window, corner_radius=15)
+lf.grid(column=0, row=0, padx=15, pady=15)
 
-lb_user_input = ttk.Label(lf, text="Benutzer: ")
-lb_user_input.grid(column=0, row=0, padx=5, pady=5, sticky=(tk.W + tk.E))
-entry_user = ttk.Entry(lf)
-entry_user.grid(column=1, row=0, padx=5, pady=5, sticky=(tk.W + tk.E))
+lb_user_input = ctk.CTkLabel(lf, text="Benutzer:")
+lb_user_input.grid(column=0, row=0, padx=5, pady=5, sticky=tk.W)
+entry_user = ctk.CTkEntry(lf, width=150)
+entry_user.grid(column=1, row=0, padx=15, pady=10, sticky=tk.E)
 
-lb_pw_input = ttk.Label(lf, text="Passwort: ")
-lb_pw_input.grid(column=0, row=1, padx=5, pady=5, sticky=(tk.W + tk.E))
-entry_passwort = ttk.Entry(lf, show='*')
-entry_passwort.grid(column=1, row=1, padx=5, pady=5, sticky=(tk.W + tk.E))
+lb_pw_input = ctk.CTkLabel(lf, text="Passwort:")
+lb_pw_input.grid(column=0, row=1, padx=5, pady=10, sticky=tk.W)
+entry_passwort = ctk.CTkEntry(lf, show='*', width=150)
+entry_passwort.grid(column=1, row=1, padx=15, pady=10, sticky=tk.E)
 
-lb_server_input = ttk.Label(lf, text="Server: ")
-lb_server_input.grid(column=2, row=0, padx=5, pady=5, sticky=(tk.W + tk.E))
-entry_server = ttk.Entry(lf)
-entry_server.grid(column=3, row=0, padx=5, pady=5, sticky=(tk.W + tk.E))
+lb_server_input = ctk.CTkLabel(lf, text="Server:")
+lb_server_input.grid(column=2, row=0, padx=5, pady=10, sticky=tk.W)
+entry_server = ctk.CTkEntry(lf, width=150)
+entry_server.grid(column=3, row=0, padx=15, pady=10, sticky=tk.E)
 
-lb_port_input = ttk.Label(lf, text="Port: ")
-lb_port_input.grid(column=2, row=1, padx=5, pady=5, sticky=(tk.W + tk.E))
-entry_port = ttk.Entry(lf)
-entry_port.grid(column=3, row=1, padx=5, pady=5, sticky=(tk.W + tk.E))
+lb_port_input = ctk.CTkLabel(lf, text="Port:")
+lb_port_input.grid(column=2, row=1, padx=5, pady=10, sticky=tk.W)
+entry_port = ctk.CTkEntry(lf, width=150)
+entry_port.grid(column=3, row=1, padx=15, pady=10, sticky=tk.E)
 
-bt_load_settings = ttk.Button(lf, text="Login laden", command=settings_laden)
-bt_load_settings.grid(column=0, row=2, columnspan=2, padx=5, pady=5, sticky=(tk.W + tk.E))
+bt_load_settings = ctk.CTkButton(lf, text="Login laden", command=settings_laden)
+bt_load_settings.grid(column=0, row=2, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_save_settings = ttk.Button(lf, text="Login speichern", command=settings_speichern)
-bt_save_settings.grid(column=2, row=2, columnspan=3, padx=5, pady=5, sticky=(tk.W + tk.E))
+bt_save_settings = ctk.CTkButton(lf, text="Login speichern", command=settings_speichern)
+bt_save_settings.grid(column=2, row=2, columnspan=3, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_akten_laden = ttk.Button(lf, text="Aktenbestand laden / aktualisieren", command=casesList)
-bt_sync_akten_laden.grid(column=0, row=3, columnspan=2, padx=5, pady=5, sticky=(tk.W + tk.E))
+bt_sync_akten_laden = ctk.CTkButton(lf, text="Aktenbestand laden / aktualisieren", command=casesList)
+bt_sync_akten_laden.grid(column=0, row=3, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_adressen_laden = ttk.Button(lf, text="Adressenbestand laden / aktualisieren", command=contactsList)
-bt_sync_adressen_laden.grid(column=2, row=3, columnspan=2, padx=5, pady=5, sticky=(tk.W + tk.E))
+bt_sync_adressen_laden = ctk.CTkButton(lf, text="Adressenbestand laden / aktualisieren", command=contactsList)
+bt_sync_adressen_laden.grid(column=2, row=3, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
+
+bt_sync_ordner_waehlen = ctk.CTkButton(lf, text="Sync Ordner wählen",
+                                    command=get_and_save_sync_folder)
+bt_sync_ordner_waehlen.grid(column=0, row=4, columnspan=4, padx=15, pady=10, sticky=(tk.W + tk.E))
+
+# Frame Button Sync
+lf_bt_sync = ctk.CTkFrame(window, corner_radius=15)
+lf_bt_sync.grid(column=0, row=1, padx=10, pady=20)
+
+lb_akte_to_sync_input = ctk.CTkLabel(lf_bt_sync, text="Aktenzeichen: ")
+lb_akte_to_sync_input.grid(column=0, row=1, padx=10, sticky=(tk.W + tk.E))
+entry_akte_to_sync_input = ctk.CTkEntry(lf_bt_sync)
+entry_akte_to_sync_input.grid(column=1, row=1, padx=10, pady=10, sticky=(tk.W + tk.E))
+
+bt_sync_aktivieren = ctk.CTkButton(lf_bt_sync, text="Sync an",
+                                command=lambda: switch_sync_on(entry_akte_to_sync_input.get()))
+bt_sync_aktivieren.grid(column=3, row=1, padx=10, pady=10)
+
+bt_sync_deaktivieren = ctk.CTkButton(lf_bt_sync, text="Sync aus",
+                                  command=lambda: switch_sync_off(entry_akte_to_sync_input.get()))
+bt_sync_deaktivieren.grid(column=4, row=1, padx=10, pady=10)
+
 
 # BUTTON Sync Starten FRAME
-lf_bt_sync_starten = ttk.LabelFrame(window)
-lf_bt_sync_starten.grid(column=0, row=1, padx=15, pady=20)
+lf_bt_sync_starten = ctk.CTkFrame(window, corner_radius=15)
+lf_bt_sync_starten.grid(column=0, row=2, padx=15, pady=20)
 
-bt_sync_ordner_waehlen = ttk.Button(lf_bt_sync_starten, text="Sync Ordner wählen",
-                                    command=get_and_save_sync_folder)
-bt_sync_ordner_waehlen.pack(side=tk.TOP, padx=5, pady=10)
-bt_sync_starten = ttk.Button(lf_bt_sync_starten, text="Synchronisation starten",
+
+bt_sync_starten = ctk.CTkButton(lf_bt_sync_starten, text="Synchronisation starten",
                              command=lambda: getSyncedCases(entry_user.get()))
-bt_sync_starten.pack(side=tk.BOTTOM, padx=5, pady=10)
+bt_sync_starten.pack(side=tk.TOP, padx=15, pady=10)
 
-# Frame Button Sync und Listbox
-lf_bt_sync = ttk.LabelFrame(window, text="Einzelne Akten für Synchronisation aktivieren / deaktivieren")
-lf_bt_sync.grid(column=0, row=5, padx=15, pady=20)
+progress_bar = ttk.Progressbar(lf_bt_sync_starten, orient=tk.HORIZONTAL, variable=progress_var, length=300, mode="determinate")
+progress_bar.pack(side=tk.BOTTOM, padx=10, pady=10)
 
-lb_akte_to_sync_input = ttk.Label(lf_bt_sync, text="Aktenzeichen: ")
-lb_akte_to_sync_input.grid(column=0, row=1, padx=5, sticky=(tk.W + tk.E))
-entry_akte_to_sync_input = ttk.Entry(lf_bt_sync)
-entry_akte_to_sync_input.grid(column=1, row=1, padx=5, pady=5, sticky=(tk.W + tk.E))
 
-bt_sync_aktivieren = ttk.Button(lf_bt_sync, text="Sync an",
-                                command=lambda: switch_sync_on(entry_akte_to_sync_input.get()))
-bt_sync_aktivieren.grid(column=3, row=1, padx=5, pady=5)
-
-bt_sync_deaktivieren = ttk.Button(lf_bt_sync, text="Sync aus",
-                                  command=lambda: switch_sync_off(entry_akte_to_sync_input.get()))
-bt_sync_deaktivieren.grid(column=4, row=1, padx=5, pady=5)
+########################## STATUS TEXT FELD ###########################
 
 status_text = tk.Text(width=75, height=12)
-status_text.grid(row=99, padx=5, pady=15, columnspan=4, sticky=(tk.W + tk.E + tk.S))
+status_text.configure(font=("Courier", 15))
+status_text.grid(row=99, padx=15, pady=15, columnspan=4, sticky=(tk.W + tk.E + tk.S))
 
 ################### General loading of Data ##########################
 
