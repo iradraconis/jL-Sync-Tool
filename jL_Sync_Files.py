@@ -16,7 +16,7 @@ import re
 
 import customtkinter as ctk
 
-ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # TODO: große Dateien über 100 mb führen ggfs. zu Abbruch des Downloads (Fehler ausgeben, oder Problem anders lösen)
