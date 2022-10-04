@@ -16,8 +16,8 @@ import re
 
 import customtkinter as ctk
 
-ctk.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
-ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # TODO: große Dateien über 100 mb führen ggfs. zu Abbruch des Downloads (Fehler ausgeben, oder Problem anders lösen)
 # TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
@@ -665,7 +665,7 @@ def main():
 
 ############################# GUI ##########################
 window = ctk.CTk()
-window.geometry("650x730+550+150")
+window.geometry("685x730+550+150")
 window.title("j-Lawyer-Tools --- jL-Sync-Files")
 window.columnconfigure(0, weight=1)
 window.rowconfigure(99, weight=1)
