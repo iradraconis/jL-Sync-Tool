@@ -19,10 +19,11 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-# TODO: große Dateien über 100 mb führen ggfs. zu Abbruch des Downloads (Fehler ausgeben, oder Problem anders lösen)
+# TODO: _Kalender.txt => Sortiertung der Einträge absteigend nach Datum
 # TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
+# TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
-# beim Sync zum Server werden dortige Dateien nicht überschrieben.
+# beim Sync zum Server werden dortige Dateien nicht überschrieben. ggfs. mit jLawyer 2.4 gefixt => Datei wird umbenannt?
 # Fehler, wenn Dateien mit demselben Namen auf dem Server vorhanden sind, aber gelöscht wurden und im Papierkorb liegen
 
 
@@ -413,31 +414,46 @@ def getDueDates(case_id):
     return response_dict
 
 
+# new implementation with downloading in chunks
 def dateiEmpfangen(document_id):
-    """lädt Datei einer Akte herunter"""
+    """Lädt Datei einer Akte herunter und speichert sie auf der Festplatte."""
 
+    # Verbindungsparameter holen
     user = entry_user.get()
     password = entry_passwort.get()
     server_adresse = entry_server.get()
     port = entry_port.get()
 
-    url = ("http://" + server_adresse + ":" + port + "/j-lawyer-io/rest/v1/cases/document/" + document_id + "/content")
+    # Erzeugen Sie die URL mit f-string anstelle von +
+    url = f"http://{server_adresse}:{port}/j-lawyer-io/rest/v1/cases/document/{document_id}/content"
 
     try:
-        r = requests.get(url, auth=HTTPBasicAuth(user, password), timeout=120)
-    except requests.exceptions.ConnectionError:
-        print("Verbindungsfehler")
-        status_text.insert(tk.END, f"\nKeine Verbindung zum Server \n")
-    # print(f"Status code: {r.status_code}")
+        # Download der Datei. Der Parameter stream=True ermöglicht das Herunterladen großer Dateien.
+        r = requests.get(url, auth=HTTPBasicAuth(user, password), timeout=120, stream=True)
+        r.raise_for_status()  # überprüft, ob der Request erfolgreich war
+    except requests.exceptions.HTTPError as errh:
+        print("Http Fehler:", errh)
+        status_text.insert(tk.END, f"\nHTTP Fehler: {errh}\n")
+        return
+    except requests.exceptions.ConnectionError as errc:
+        print("Verbindungsfehler:", errc)
+        status_text.insert(tk.END, f"\nVerbindungsfehler: {errc}\n")
+        return
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Fehler:", errt)
+        status_text.insert(tk.END, f"\nTimeout Fehler: {errt}\n")
+        return
+    except requests.exceptions.RequestException as err:
+        print("Fehler:", err)
+        status_text.insert(tk.END, f"\nFehler: {err}\n")
+        return
 
-    # Speichert die Api Antwort in einer Variablen
+    # Die Antwort als JSON interpretieren
     response_dict = r.json()
     file_name = response_dict['fileName']
-    print(file_name)
-
     base64_string = response_dict['base64content']
 
-    # base64content wird in Datei geschrieben
+    # Datei speichern, wenn sie noch nicht existiert
     if not os.path.isfile(file_name):
         print("PDF Datei wird heruntergeladen... ")
         status_text.insert(tk.END, f"Lade {file_name}...\n")
@@ -749,7 +765,7 @@ progress_bar.pack(side=tk.BOTTOM, padx=10, pady=10)
 ########################## STATUS TEXT FELD ###########################
 
 status_text = tk.Text(width=75, height=12)
-status_text.configure(font=("Courier", 15))
+status_text.configure(font=("Courier", 12))
 status_text.grid(row=99, padx=15, pady=15, columnspan=4, sticky=(tk.W + tk.E + tk.S))
 
 ################### General loading of Data ##########################
