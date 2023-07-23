@@ -19,7 +19,6 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-# TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
 # beim Sync zum Server werden dortige Dateien nicht überschrieben. ggfs. mit jLawyer 2.4 gefixt => Datei wird umbenannt?
@@ -364,7 +363,7 @@ def dateiSenden(datei_local_name, case_id):
 
 def dateiListeEmpfangen(case_id):
     """lädt eine Liste von Dateien einer Akte herunter und gibt eine Liste zurück,
-    die PDF Dateien und HTML Dateien beinhaltet:  /v1/cases/{id}/documents
+    /v1/cases/{id}/documents
     """
 
     user = entry_user.get()
@@ -457,6 +456,7 @@ def dateiEmpfangen(document_id):
         print("PDF Datei wird heruntergeladen... ")
         status_text.insert(tk.END, f"Lade {file_name}...\n")
         status_text.see(tk.END)
+        window.update()
         base64_file_bytes = base64_string.encode('utf-8')
         with open(file_name, 'wb') as file_to_save:
             decoded_data = base64.decodebytes(base64_file_bytes)
@@ -465,6 +465,7 @@ def dateiEmpfangen(document_id):
         print("Datei existiert bereits")
         status_text.insert(tk.END, f"{file_name} existiert bereits\n")
         status_text.see(tk.END)
+        window.update()
 
 
 def getSyncedCases(principal_id):
@@ -548,7 +549,7 @@ def getSyncedCases(principal_id):
         status_text.see(tk.END)
         progress_var.set(index)
         window.update()
-        # 2 Listen, id und name werden erstellt und mit den Dateien Remote vergleichen
+        # 2 Listen, id und name werden erstellt und mit den Dateien Remote verglichen
         datei_liste_response = dateiListeEmpfangen(response_dict[index]['id'])
         # print(datei_liste_response)
 
@@ -574,16 +575,27 @@ def getSyncedCases(principal_id):
             print(count, "Dokumenten-Name: ", value['name'])
 
             datei_liste_remote.append(value['name'])
-            if ((".pdf" in str({value['name']})) | (".html" in str({value['name']}))) & (
-                    ".eml" not in str({value['name']})):
+
+            if sync_pdf_html_only.get() == True:  # nur PDF und HTML Dateien werden synchronisiert
+                if ((".pdf" in str({value['name']})) | (".html" in str({value['name']}))) & (
+                        ".eml" not in str({value['name']})):
+                    if not value['name'] in datei_liste_local_name:
+                        dateiEmpfangen(value['id'])
+
+                    else:
+                        pass  # Datei existiert bereits lokal
+            else:  # alle Dateien werden synchronisiert
                 if not value['name'] in datei_liste_local_name:
                     dateiEmpfangen(value['id'])
+
                 else:
-                    pass  # Datei existiert bereits lokal
+                    pass
 
         for datei in datei_liste_local_name:
             if (datei not in datei_liste_remote):
+                window.update()
                 dateiSenden(datei_local_name=datei, case_id=response_dict[index]['id'])
+
             else:
                 pass  # Datei existiert bereits remote
 
@@ -636,8 +648,6 @@ def getSyncedCases(principal_id):
 
         beteiligte_in_akte = beteiligte_abrufen(response_dict[index]['id'])
         # print(beteiligte_in_akte)
-        # Sortieren Sie die Liste nach den Namen der Beteiligten
-        # beteiligte_in_akte_details.sort(key=lambda x: (x['name'], x['firstName']))
 
         etiketten_in_akte = etiketten_abrufen(response_dict[index]['id'])
 
@@ -687,6 +697,7 @@ window.title("j-Lawyer-Tools --- jL-Sync-Files")
 window.columnconfigure(0, weight=1)
 window.rowconfigure(99, weight=1)
 
+sync_pdf_html_only = tk.BooleanVar(window, True)
 status = tk.StringVar(window, "Status...")
 progress_var = tk.IntVar(window)
 
@@ -749,6 +760,9 @@ bt_sync_deaktivieren = ctk.CTkButton(lf_bt_sync, text="Sync aus",
                                   command=lambda: switch_sync_off(entry_akte_to_sync_input.get()))
 bt_sync_deaktivieren.grid(column=4, row=1, padx=10, pady=10)
 
+# Checkbutton: nur PDF/HTML Dateien synchronisieren
+chk_sync_pdf_html_only = ctk.CTkCheckBox(lf, text="Nur PDF/HTML Dateien synchronisieren", variable=sync_pdf_html_only)
+chk_sync_pdf_html_only.grid(column=0, row=5, columnspan=4, padx=15, pady=10, sticky=(tk.W + tk.E))
 
 # BUTTON Sync Starten FRAME
 lf_bt_sync_starten = ctk.CTkFrame(window, corner_radius=15)
