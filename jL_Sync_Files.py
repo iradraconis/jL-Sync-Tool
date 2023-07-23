@@ -19,7 +19,6 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-# TODO: _Kalender.txt => Sortierung der Einträge absteigend nach Datum
 # TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
