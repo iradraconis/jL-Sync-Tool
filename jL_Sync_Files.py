@@ -24,6 +24,9 @@ ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dar
 # beim Sync zum Server werden dortige Dateien nicht überschrieben. ggfs. mit jLawyer 2.4 gefixt => Datei wird umbenannt?
 # Fehler, wenn Dateien mit demselben Namen auf dem Server vorhanden sind, aber gelöscht wurden und im Papierkorb liegen
 
+# Gibt den Pfad zum aktuellen Skript zurück
+current_script_path = os.path.dirname(os.path.realpath(__file__))
+
 
 def settings_speichern():
     """Einstellungen für LogIn Daten werden gespeichert
@@ -31,7 +34,7 @@ def settings_speichern():
 
     data = {'user': entry_user.get(), 'password': entry_passwort.get(), 'server_adresse': entry_server.get(),
             'port': entry_port.get()}
-    with open("jL_Sync_Files_Settings.json", "w") as write_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Settings.json", "w") as write_file:
         json.dump(data, write_file)
     # settings_laden()
     status_text.insert(tk.END, '\nLogin Daten gespeichert (unsicher!)\n')
@@ -41,7 +44,7 @@ def settings_speichern():
 def settings_laden():
     """Einstellungen für LogIn Daten werden geladen und die Felder befüllt"""
 
-    with open("jL_Sync_Files_Settings.json", "r") as read_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Settings.json", "r") as read_file:
         settings = json.load(read_file)
 
     entry_user.delete(0, tk.END)
@@ -57,7 +60,7 @@ def settings_laden():
 
 
 def load_sync_folder():
-    with open("jL_Sync_Files_Path_Settings.json", "r") as read_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Path_Settings.json", "r") as read_file:
         sync_path = json.load(read_file)['sync_path']
         status_text.insert(tk.END, f'\nSync Ordner {sync_path} geladen\n')
         status_text.see(tk.END)
@@ -72,7 +75,7 @@ def get_and_save_sync_folder():
     sync_path = filedialog.askdirectory(title="Aktenordner wählen")
 
     data = {'sync_path': sync_path}
-    with open("jL_Sync_Files_Path_Settings.json", "w") as write_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Path_Settings.json", "w") as write_file:
         json.dump(data, write_file)
     # settings_laden()
     status_text.insert(tk.END, f'\nSync Ordner {sync_path} gespeichert\n')
@@ -215,9 +218,9 @@ def contactsList():
     # Speichert die Api Antwort in einer Variablen
     contacts = r.json()
     global contacts_loaded
-    with open("jL_Sync_Files_Contacts.json", "w") as write_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Contacts.json", "w") as write_file:
         json.dump(contacts, write_file)
-    with open("jL_Sync_Files_Contacts.json", "r") as read_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Contacts.json", "r") as read_file:
         contacts_loaded = json.load(read_file)
 
     # Verarbeitet die Ergebnisse
@@ -248,9 +251,9 @@ def casesList():
     # Speichert die Api Antwort in einer Variablen
     cases = r.json()
     global cases_loaded
-    with open("jL_Sync_Files_Cases.json", "w") as write_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Cases.json", "w") as write_file:
         json.dump(cases, write_file)
-    with open("jL_Sync_Files_Cases.json", "r") as read_file:
+    with open(f"{current_script_path}/jL_Sync_Files_Cases.json", "r") as read_file:
         cases_loaded = json.load(read_file)
     # Verarbeitet die Ergebnisse
     print(f"Zahl der Akten: {len(cases)}")
@@ -780,7 +783,7 @@ progress_bar.pack(side=tk.BOTTOM, padx=10, pady=10)
 ########################## STATUS TEXT FELD ###########################
 
 status_text = tk.Text(width=75, height=12)
-status_text.configure(font=("Courier", 12))
+status_text.configure(font=("Courier", 11))
 status_text.grid(row=99, padx=15, pady=15, columnspan=4, sticky=(tk.W + tk.E + tk.S))
 
 ################### General loading of Data ##########################
@@ -821,7 +824,7 @@ if os.path.exists("jL_Sync_Files_Path_Settings.json"):
     status_text.insert(tk.END, f'\nSync Ordner {sync_path} geladen\n')
     status_text.see(tk.END)
 else:
-    status_text.insert(tk.END, f'\nBitte erst Sync Ordner auswählen\n')
+    status_text.insert(tk.END, f'\nBitte zuerst Sync Ordner auswählen\n')
     status_text.see(tk.END)
 
 if __name__ == "__main__":
