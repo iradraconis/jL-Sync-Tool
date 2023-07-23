@@ -19,7 +19,7 @@ import customtkinter as ctk
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-# TODO: _Kalender.txt => Sortiertung der Einträge absteigend nach Datum
+# TODO: _Kalender.txt => Sortierung der Einträge absteigend nach Datum
 # TODO: Checkbutton, ob nur PDF/HTML oder alle Dateien, oder alternative Version erstellen
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
@@ -590,9 +590,9 @@ def getSyncedCases(principal_id):
 
         # schreibt alle WV/Termine/Fristen in eine html/text Datei
         dueDates = getDueDates(case_id=response_dict[index]['id'])
-        # dueDates_sorted = dict(sorted(dueDates.items(),
-        #                    key=lambda dueDate: dueDate[1],
-        #                    reverse=True))
+
+        # Sortiere die dueDates Liste in absteigender Reihenfolge
+        dueDates.sort(key=lambda x: x['dueDate'], reverse=True)
 
 
         ############### Erstellt eine Datei mit Wiedervorlagen, Terminen etc. ##################
@@ -637,6 +637,8 @@ def getSyncedCases(principal_id):
 
         beteiligte_in_akte = beteiligte_abrufen(response_dict[index]['id'])
         # print(beteiligte_in_akte)
+        # Sortieren Sie die Liste nach den Namen der Beteiligten
+        # beteiligte_in_akte_details.sort(key=lambda x: (x['name'], x['firstName']))
 
         etiketten_in_akte = etiketten_abrufen(response_dict[index]['id'])
 
