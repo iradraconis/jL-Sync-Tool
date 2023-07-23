@@ -16,13 +16,12 @@ import re
 
 import customtkinter as ctk
 
-ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
-ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
-
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
-# beim Sync zum Server werden dortige Dateien nicht überschrieben. ggfs. mit jLawyer 2.4 gefixt => Datei wird umbenannt?
-# Fehler, wenn Dateien mit demselben Namen auf dem Server vorhanden sind, aber gelöscht wurden und im Papierkorb liegen
+
+
+ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Gibt den Pfad zum aktuellen Skript zurück
 current_script_path = os.path.dirname(os.path.realpath(__file__))
