@@ -3,7 +3,10 @@ A synchronisation tool for j-Lawyer that syncs case files to local hard drive.
 You need a running j-Lawyer.org installation (server) to sync files. 
 Also go to www.j-lawyer.org 
 
-**Python 3.10** or newer required, download from python.org
+**Python 3.10** or newer required. Download from python.org or install via command line. Linux should have Python 3 installed (Terminal: python3 --version) 
+
+Open Suse
+    sudo zypper in python3 
 
 **Tkinter** required, install via terminal 
 
@@ -14,6 +17,12 @@ on Ubuntu or
     sudo dnf install python3-tkinter 
 
 on Fedora
+
+or 
+
+    sudo zypper in python3-tk
+
+on Open Suse
 
 or 
 
