@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import datetime
 import os
 import pathlib
