@@ -21,7 +21,7 @@ import customtkinter as ctk
 
 
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
-ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
+ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Gibt den Pfad zum aktuellen Skript zurück
 current_script_path = os.path.dirname(os.path.realpath(__file__))
