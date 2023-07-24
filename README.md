@@ -3,6 +3,10 @@ A synchronisation tool for j-Lawyer that syncs case files to local hard drive.
 You need a running j-Lawyer.org installation (server) to sync files. 
 Also go to www.j-lawyer.org 
 
+![Alt text](/Screenshot.png?raw=true "jL-Sync-Tool")
+
+
+
 **Python 3.10** or newer required. Download from python.org or install via command line. Linux should have Python 3 installed (Terminal: python3 --version) 
 
 Open Suse
