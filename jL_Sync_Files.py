@@ -26,8 +26,14 @@ ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Gibt den Pfad zum aktuellen Skript zurück
-current_script_path = os.path.dirname(os.path.realpath(__file__))
+# current_script_path = os.path.dirname(os.path.realpath(__file__))
 
+home = os.path.expanduser("~")
+settings_path = os.path.join(home, ".jL_Sync_Files/")
+if not os.path.exists(settings_path):
+    # Erstellen des Ordners, falls er nicht existiert
+    os.makedirs(settings_path)
+print("Einstellungen geladen aus: " + settings_path)
 
 def settings_speichern():
     """Einstellungen für LogIn Daten werden gespeichert
@@ -35,8 +41,12 @@ def settings_speichern():
 
     data = {'user': entry_user.get(), 'password': entry_passwort.get(), 'server_adresse': entry_server.get(),
             'port': entry_port.get()}
-    with open(f"{current_script_path}/jL_Sync_Files_Settings.json", "w") as write_file:
-        json.dump(data, write_file)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Settings.json", "w") as write_file:
+            json.dump(data, write_file)
+    except:
+        status_text.insert(tk.END, '\nFehler, Datei/Ordner nicht gefunden\n')
+        status_text.see(tk.END)
     # settings_laden()
     status_text.insert(tk.END, '\nLogin Daten gespeichert (unsicher!)\n')
     status_text.see(tk.END)
@@ -45,27 +55,35 @@ def settings_speichern():
 def settings_laden():
     """Einstellungen für LogIn Daten werden geladen und die Felder befüllt"""
 
-    with open(f"{current_script_path}/jL_Sync_Files_Settings.json", "r") as read_file:
-        settings = json.load(read_file)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Settings.json", "r") as read_file:
+            settings = json.load(read_file)
 
-    entry_user.delete(0, tk.END)
-    entry_user.insert(0, settings['user'])
-    entry_passwort.delete(0, tk.END)
-    entry_passwort.insert(0, settings['password'])
-    entry_server.delete(0, tk.END)
-    entry_server.insert(0, settings['server_adresse'])
-    entry_port.delete(0, tk.END)
-    entry_port.insert(0, settings['port'])
-    status_text.insert(tk.END, '\nLogin Daten geladen\n')
-    status_text.see(tk.END)
+        entry_user.delete(0, tk.END)
+        entry_user.insert(0, settings['user'])
+        entry_passwort.delete(0, tk.END)
+        entry_passwort.insert(0, settings['password'])
+        entry_server.delete(0, tk.END)
+        entry_server.insert(0, settings['server_adresse'])
+        entry_port.delete(0, tk.END)
+        entry_port.insert(0, settings['port'])
+        status_text.insert(tk.END, '\nLogin Daten geladen\n')
+        status_text.see(tk.END)
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nKeine Login Daten gespeichert\n')
+        status_text.see(tk.END)
 
 
 def load_sync_folder():
-    with open(f"{current_script_path}/jL_Sync_Files_Path_Settings.json", "r") as read_file:
-        sync_path = json.load(read_file)['sync_path']
-        status_text.insert(tk.END, f'\nSync Ordner {sync_path} geladen\n')
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Path_Settings.json", "r") as read_file:
+            sync_path = json.load(read_file)['sync_path']
+            status_text.insert(tk.END, f'\nSync Ordner {sync_path} geladen\n')
+            status_text.see(tk.END)
+        return sync_path
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nKein Sync Ordner gespeichert\n')
         status_text.see(tk.END)
-    return sync_path
 
 
 def get_and_save_sync_folder():
@@ -76,8 +94,12 @@ def get_and_save_sync_folder():
     sync_path = filedialog.askdirectory(title="Aktenordner wählen")
 
     data = {'sync_path': sync_path}
-    with open(f"{current_script_path}/jL_Sync_Files_Path_Settings.json", "w") as write_file:
-        json.dump(data, write_file)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Path_Settings.json", "w") as write_file:
+            json.dump(data, write_file)
+    except FileNotFoundError:
+        status_text.insert('\nFehler beim Laden und Speichern des Sync-Ordners\n')
+        status_text.see(tk.END)
     # settings_laden()
     status_text.insert(tk.END, f'\nSync Ordner {sync_path} gespeichert\n')
     status_text.see(tk.END)
@@ -219,10 +241,18 @@ def contactsList():
     # Speichert die Api Antwort in einer Variablen
     contacts = r.json()
     global contacts_loaded
-    with open(f"{current_script_path}/jL_Sync_Files_Contacts.json", "w") as write_file:
-        json.dump(contacts, write_file)
-    with open(f"{current_script_path}/jL_Sync_Files_Contacts.json", "r") as read_file:
-        contacts_loaded = json.load(read_file)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Contacts.json", "w") as write_file:
+            json.dump(contacts, write_file)
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nFehler\n')
+        status_text.see(tk.END)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Contacts.json", "r") as read_file:
+            contacts_loaded = json.load(read_file)
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nFehler\n')
+        status_text.see(tk.END)
 
     # Verarbeitet die Ergebnisse
     print(f"Zahl der Adressen: {len(contacts)}")
@@ -252,10 +282,19 @@ def casesList():
     # Speichert die Api Antwort in einer Variablen
     cases = r.json()
     global cases_loaded
-    with open(f"{current_script_path}/jL_Sync_Files_Cases.json", "w") as write_file:
-        json.dump(cases, write_file)
-    with open(f"{current_script_path}/jL_Sync_Files_Cases.json", "r") as read_file:
-        cases_loaded = json.load(read_file)
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Cases.json", "w") as write_file:
+            json.dump(cases, write_file)
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nFehler\n')
+        status_text.see(tk.END)
+
+    try:
+        with open(f"{settings_path}/jL_Sync_Files_Cases.json", "r") as read_file:
+            cases_loaded = json.load(read_file)
+    except FileNotFoundError:
+        status_text.insert(tk.END, '\nFehler\n')
+        status_text.see(tk.END)
     # Verarbeitet die Ergebnisse
     print(f"Zahl der Akten: {len(cases)}")
     status_text.insert(tk.END, f"\n{len(cases)} Akten vom Server geladen\n")
@@ -789,15 +828,15 @@ status_text.grid(row=99, padx=15, pady=15, columnspan=4, sticky=(tk.W + tk.E + t
 
 ################### General loading of Data ##########################
 
-if os.path.exists("jL_Sync_Files_Settings.json"):
+if os.path.exists(settings_path + "jL_Sync_Files_Settings.json"):
     settings_laden()
 else:
     status_text.insert(tk.END, "\nBitte Login Daten für den Server eingeben.\n")
     status_text.see(tk.END)
 
 # Cases werden geprüft und ggfs. geladen
-if os.path.exists("jL_Sync_Files_Cases.json"):
-    with open("jL_Sync_Files_Cases.json", "r") as read_file:
+if os.path.exists(settings_path + "jL_Sync_Files_Cases.json"):
+    with open(settings_path + "jL_Sync_Files_Cases.json", "r") as read_file:
         global cases_load
         cases_loaded = json.load(read_file)
         status_text.insert(tk.END, "\nLetzten Aktenbestand geladen.\n")
@@ -807,8 +846,8 @@ else:
     status_text.see(tk.END)
 
 # Contacts werden geladen, falls gespeichert, ansonsten Hinweis beim 1. Start
-if os.path.exists("jL_Sync_Files_Contacts.json"):
-    with open("jL_Sync_Files_Contacts.json", "r") as read_file:
+if os.path.exists(settings_path + "jL_Sync_Files_Contacts.json"):
+    with open(settings_path + "jL_Sync_Files_Contacts.json", "r") as read_file:
 
         contacts_loaded = json.load(read_file)
         status_text.insert(tk.END, "\nLetzten Adressenbestand geladen.\n")
@@ -818,9 +857,8 @@ else:
     status_text.see(tk.END)
 
 # Sync Ordner wird geladen, falls einer gespeichert ist
-if os.path.exists("jL_Sync_Files_Path_Settings.json"):
-    with open("jL_Sync_Files_Path_Settings.json", "r") as read_file:
-
+if os.path.exists(settings_path + "jL_Sync_Files_Path_Settings.json"):
+    with open(settings_path + "jL_Sync_Files_Path_Settings.json", "r") as read_file:
         sync_path = json.load(read_file)['sync_path']
     status_text.insert(tk.END, f'\nSync Ordner {sync_path} geladen\n')
     status_text.see(tk.END)
