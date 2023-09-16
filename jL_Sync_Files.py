@@ -492,6 +492,7 @@ def dateiEmpfangen(document_id):
     # Die Antwort als JSON interpretieren
     response_dict = r.json()
     file_name = response_dict['fileName']
+    file_name = file_name.replace('/', '-')
     base64_string = response_dict['base64content']
 
     # Datei speichern, wenn sie noch nicht existiert
