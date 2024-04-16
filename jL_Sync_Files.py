@@ -16,14 +16,14 @@ from datetime import datetime
 from dateutil import tz
 import re
 
-import customtkinter as ctk
+import customtkinter
 
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
 
 
 
-ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
-ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+#customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
+#customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Gibt den Pfad zum aktuellen Skript zurück
 # current_script_path = os.path.dirname(os.path.realpath(__file__))
@@ -735,8 +735,9 @@ def main():
 
 
 ############################# GUI ##########################
-window = ctk.CTk()
+window = customtkinter.CTk()
 window.geometry("685x730+550+150")
+window.eval('tk::PlaceWindow . center')
 window.title("j-Lawyer-Tools --- jL-Sync-Files")
 window.columnconfigure(0, weight=1)
 window.rowconfigure(99, weight=1)
@@ -748,72 +749,72 @@ progress_var = tk.IntVar(window)
 
 
 # label frame SETTINGS und LOGIN laden und speichern Buttons
-lf = ctk.CTkFrame(window, corner_radius=15)
+lf = customtkinter.CTkFrame(window, corner_radius=15)
 lf.grid(column=0, row=0, padx=15, pady=15)
 
-lb_user_input = ctk.CTkLabel(lf, text="Benutzer:")
+lb_user_input = customtkinter.CTkLabel(lf, text="Benutzer:")
 lb_user_input.grid(column=0, row=0, padx=5, pady=5, sticky=tk.W)
-entry_user = ctk.CTkEntry(lf, width=150)
+entry_user = customtkinter.CTkEntry(lf, width=150)
 entry_user.grid(column=1, row=0, padx=15, pady=10, sticky=tk.E)
 
-lb_pw_input = ctk.CTkLabel(lf, text="Passwort:")
+lb_pw_input = customtkinter.CTkLabel(lf, text="Passwort:")
 lb_pw_input.grid(column=0, row=1, padx=5, pady=10, sticky=tk.W)
-entry_passwort = ctk.CTkEntry(lf, show='*', width=150)
+entry_passwort = customtkinter.CTkEntry(lf, show='*', width=150)
 entry_passwort.grid(column=1, row=1, padx=15, pady=10, sticky=tk.E)
 
-lb_server_input = ctk.CTkLabel(lf, text="Server:")
+lb_server_input = customtkinter.CTkLabel(lf, text="Server:")
 lb_server_input.grid(column=2, row=0, padx=5, pady=10, sticky=tk.W)
-entry_server = ctk.CTkEntry(lf, width=150)
+entry_server = customtkinter.CTkEntry(lf, width=150)
 entry_server.grid(column=3, row=0, padx=15, pady=10, sticky=tk.E)
 
-lb_port_input = ctk.CTkLabel(lf, text="Port:")
+lb_port_input = customtkinter.CTkLabel(lf, text="Port:")
 lb_port_input.grid(column=2, row=1, padx=5, pady=10, sticky=tk.W)
-entry_port = ctk.CTkEntry(lf, width=150)
+entry_port = customtkinter.CTkEntry(lf, width=150)
 entry_port.grid(column=3, row=1, padx=15, pady=10, sticky=tk.E)
 
-bt_load_settings = ctk.CTkButton(lf, text="Login laden", command=settings_laden)
+bt_load_settings = customtkinter.CTkButton(lf, text="Login laden", command=settings_laden)
 bt_load_settings.grid(column=0, row=2, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_save_settings = ctk.CTkButton(lf, text="Login speichern", command=settings_speichern)
+bt_save_settings = customtkinter.CTkButton(lf, text="Login speichern", command=settings_speichern)
 bt_save_settings.grid(column=2, row=2, columnspan=3, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_akten_laden = ctk.CTkButton(lf, text="Aktenbestand laden / aktualisieren", command=casesList)
+bt_sync_akten_laden = customtkinter.CTkButton(lf, text="Aktenbestand laden / aktualisieren", command=casesList)
 bt_sync_akten_laden.grid(column=0, row=3, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_adressen_laden = ctk.CTkButton(lf, text="Adressenbestand laden / aktualisieren", command=contactsList)
+bt_sync_adressen_laden = customtkinter.CTkButton(lf, text="Adressenbestand laden / aktualisieren", command=contactsList)
 bt_sync_adressen_laden.grid(column=2, row=3, columnspan=2, padx=15, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_ordner_waehlen = ctk.CTkButton(lf, text="Sync Ordner wählen",
+bt_sync_ordner_waehlen = customtkinter.CTkButton(lf, text="Sync Ordner wählen",
                                     command=get_and_save_sync_folder)
 bt_sync_ordner_waehlen.grid(column=0, row=4, columnspan=4, padx=15, pady=10, sticky=(tk.W + tk.E))
 
 # Frame Button Sync
-lf_bt_sync = ctk.CTkFrame(window, corner_radius=15)
+lf_bt_sync = customtkinter.CTkFrame(window, corner_radius=15)
 lf_bt_sync.grid(column=0, row=1, padx=10, pady=20)
 
-lb_akte_to_sync_input = ctk.CTkLabel(lf_bt_sync, text="Aktenzeichen: ")
+lb_akte_to_sync_input = customtkinter.CTkLabel(lf_bt_sync, text="Aktenzeichen: ")
 lb_akte_to_sync_input.grid(column=0, row=1, padx=10, sticky=(tk.W + tk.E))
-entry_akte_to_sync_input = ctk.CTkEntry(lf_bt_sync)
+entry_akte_to_sync_input = customtkinter.CTkEntry(lf_bt_sync)
 entry_akte_to_sync_input.grid(column=1, row=1, padx=10, pady=10, sticky=(tk.W + tk.E))
 
-bt_sync_aktivieren = ctk.CTkButton(lf_bt_sync, text="Sync an",
+bt_sync_aktivieren = customtkinter.CTkButton(lf_bt_sync, text="Sync an",
                                 command=lambda: switch_sync_on(entry_akte_to_sync_input.get()))
 bt_sync_aktivieren.grid(column=3, row=1, padx=10, pady=10)
 
-bt_sync_deaktivieren = ctk.CTkButton(lf_bt_sync, text="Sync aus",
+bt_sync_deaktivieren = customtkinter.CTkButton(lf_bt_sync, text="Sync aus",
                                   command=lambda: switch_sync_off(entry_akte_to_sync_input.get()))
 bt_sync_deaktivieren.grid(column=4, row=1, padx=10, pady=10)
 
 # Checkbutton: nur PDF/HTML Dateien synchronisieren
-chk_sync_pdf_html_only = ctk.CTkCheckBox(lf, text="Nur PDF/HTML Dateien synchronisieren", variable=sync_pdf_html_only)
+chk_sync_pdf_html_only = customtkinter.CTkCheckBox(lf, text="Nur PDF/HTML Dateien synchronisieren", variable=sync_pdf_html_only)
 chk_sync_pdf_html_only.grid(column=0, row=5, columnspan=4, padx=15, pady=10, sticky=(tk.W + tk.E))
 
 # BUTTON Sync Starten FRAME
-lf_bt_sync_starten = ctk.CTkFrame(window, corner_radius=15)
+lf_bt_sync_starten = customtkinter.CTkFrame(window, corner_radius=15)
 lf_bt_sync_starten.grid(column=0, row=2, padx=15, pady=20)
 
 
-bt_sync_starten = ctk.CTkButton(lf_bt_sync_starten, text="Synchronisation starten",
+bt_sync_starten = customtkinter.CTkButton(lf_bt_sync_starten, text="Synchronisation starten",
                              command=lambda: getSyncedCases(entry_user.get()))
 bt_sync_starten.pack(side=tk.TOP, padx=15, pady=10)
 
