@@ -19,7 +19,9 @@ import re
 import customtkinter
 
 # TODO: Checkbutton ob Ordnerstruktur der Akte auf dem Server übernommen werden soll
-
+# python 3 -m venv venv
+# source venv/bin/activate
+# pip3 install customtkinter requests dateutil
 
 
 #customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
