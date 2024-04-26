@@ -738,8 +738,14 @@ def main():
 
 ############################# GUI ##########################
 window = customtkinter.CTk()
-window.geometry("685x730+550+150")
-window.eval('tk::PlaceWindow . center')
+window_width = 685
+window_height = 730
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+position_top = int(screen_height / 2 - window_height / 2)
+position_right = int(screen_width / 2 - window_width / 2)
+window.geometry(f"{window_width}x{window_height}+{position_right}+{position_top}")
+
 window.title("j-Lawyer-Tools --- jL-Sync-Files")
 window.columnconfigure(0, weight=1)
 window.rowconfigure(99, weight=1)
